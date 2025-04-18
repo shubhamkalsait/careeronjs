@@ -7,15 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Color Variables */
+        /* ==========================================================================
+           Base Styles and Variables
+           ========================================================================== */
         :root {
+            /* Colors */
             --primary: #573CFA;
             --primary-dark: #4930d8;
             --primary-light: #6f58fb;
@@ -25,6 +21,8 @@
             --danger: #E8083E;
             --success: #02864A;
             --neutral: #1C1A27;
+            
+            /* Neutral Scale */
             --neutral-100: #f8f9fa;
             --neutral-200: #e9ecef;
             --neutral-300: #dee2e6;
@@ -34,8 +32,28 @@
             --neutral-700: #495057;
             --neutral-800: #343a40;
             --neutral-900: #1C1A27;
+
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 0.75rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
         }
 
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Base Styles */
         body {
             font-family: 'Poppins', sans-serif;
             line-height: 1.6;
@@ -43,7 +61,11 @@
             background-color: var(--neutral-100);
         }
 
-        /* Header Styles */
+        /* ==========================================================================
+           Layout Components
+           ========================================================================== */
+        
+        /* Header */
         header {
             background-color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -56,10 +78,16 @@
         nav {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem;
+            padding: var(--spacing-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
         }
 
         .logo {
@@ -67,27 +95,30 @@
             width: auto;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
         }
 
-        /* Button Styles */
+        /* ==========================================================================
+           Buttons
+           ========================================================================== */
         .btn {
-            padding: 0.8rem 1.5rem;
+            padding: var(--spacing-md) var(--spacing-lg);
             border: none;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
             text-decoration: none;
             transition: all 0.3s ease;
             color: white;
-            font-weight: 500;
         }
 
         .btn:hover {
@@ -121,61 +152,14 @@
             color: white;
         }
 
-        /* Hero Section */
-        .hero-section {
-            position: relative;
-            height: 60vh;
-            background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            margin-top: 60px;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            padding: 0 20px;
-        }
-
-        .hero-content h1 {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .tagline {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: #fff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        }
-
-        /* Search and Filter Styles */
-        .search-box {
-            display: flex;
-            max-width: 600px;
-            margin: 0 auto;
-            gap: 0.5rem;
-        }
-
+        /* ==========================================================================
+           Form Elements
+           ========================================================================== */
         .search-input {
             flex: 1;
-            padding: 0.8rem 1rem;
+            padding: var(--spacing-md) var(--spacing-md);
             border: 2px solid var(--neutral-300);
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 1rem;
             transition: all 0.3s ease;
         }
@@ -186,18 +170,10 @@
             box-shadow: 0 0 0 3px rgba(87, 60, 250, 0.1);
         }
 
-        /* Filter styles */
-        .filters {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
         }
 
         .filter-group label {
@@ -206,9 +182,9 @@
         }
 
         .filter-select {
-            padding: 0.8rem;
+            padding: var(--spacing-md);
             border: 1px solid var(--neutral-300);
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 1rem;
             min-width: 200px;
             background-color: white;
@@ -222,34 +198,29 @@
             box-shadow: 0 0 0 3px rgba(87, 60, 250, 0.1);
         }
 
-        /* Job List Styles */
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            overflow: hidden;
-        }
-
+        /* ==========================================================================
+           Job Cards
+           ========================================================================== */
         .job-list {
             position: relative;
             width: 100%;
             margin: 0 auto;
-            padding: 1rem 0;
+            padding: var(--spacing-md) 0;
         }
 
         .job-cards-container {
             display: flex;
-            gap: 1.5rem;
+            gap: var(--spacing-lg);
             transition: transform 0.3s ease;
-            padding: 0.5rem;
-            margin: 0 -0.5rem;
+            padding: var(--spacing-xs);
+            margin: 0 calc(-1 * var(--spacing-xs));
         }
 
         .job-card {
             background: white;
             border: 1px solid var(--neutral-300);
-            padding: 1.25rem;
-            border-radius: 8px;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
             width: calc((100% - 3rem) / 3);
             min-width: 0;
             flex: 0 0 auto;
@@ -264,12 +235,12 @@
         }
 
         .job-header {
-            margin-bottom: 1rem;
+            margin-bottom: var(--spacing-md);
         }
 
         .job-header h3 {
             font-size: 1.2rem;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 var(--spacing-xs) 0;
             color: var(--neutral);
             font-weight: 600;
             white-space: nowrap;
@@ -280,7 +251,7 @@
         .company {
             color: var(--neutral-600);
             font-size: 0.95rem;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 var(--spacing-xs) 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -295,8 +266,8 @@
         .job-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
             font-size: 0.95rem;
         }
 
@@ -304,7 +275,7 @@
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -316,32 +287,29 @@
             transition: color 0.3s ease;
         }
 
-        .job-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-        }
-
+        /* ==========================================================================
+           Carousel Controls
+           ========================================================================== */
         .carousel-controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
         }
 
         .carousel-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
+            padding: var(--spacing-sm) var(--spacing-lg);
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
             font-size: 1rem;
-            transition: all 0.3s ease;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .carousel-btn:hover {
@@ -355,7 +323,9 @@
             transform: none;
         }
 
-        /* Modal Styles */
+        /* ==========================================================================
+           Modal
+           ========================================================================== */
         .modal {
             display: none;
             position: fixed;
@@ -367,9 +337,9 @@
 
         .modal-content {
             background-color: white;
-            margin: 2rem auto;
-            padding: 2rem;
-            border-radius: 8px;
+            margin: var(--spacing-xl) auto;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-md);
             max-width: 800px;
             position: relative;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -377,40 +347,27 @@
 
         .close-modal {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--neutral-600);
-            transition: color 0.3s;
+            transition: color 0.3s ease;
         }
 
         .close-modal:hover {
             color: var(--neutral);
         }
 
-        .modal-job-title {
-            font-size: 1.8rem;
-            color: var(--neutral);
-            margin-bottom: 0.5rem;
-        }
-
-        .requirement-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
         .requirement-chip {
             background-color: rgba(87, 60, 250, 0.1);
             color: var(--primary);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--spacing-xs);
             border: 1px solid rgba(87, 60, 250, 0.2);
             transition: all 0.3s ease;
         }
@@ -419,25 +376,27 @@
             background-color: rgba(87, 60, 250, 0.15);
         }
 
-        /* Footer Styles */
+        /* ==========================================================================
+           Footer
+           ========================================================================== */
         footer {
             background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
-            padding: 3rem 0;
-            margin-top: 3rem;
+            padding: var(--spacing-xl) 0;
+            margin-top: var(--spacing-xl);
             text-align: center;
         }
 
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 var(--spacing-xl);
         }
 
         .footer-links {
             display: flex;
             justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
         }
 
         .footer-links a {
@@ -455,7 +414,9 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive Styles */
+        /* ==========================================================================
+           Responsive Styles
+           ========================================================================== */
         @media (max-width: 1024px) {
             .job-card {
                 width: calc((100% - 1.5rem) / 2);
@@ -472,8 +433,16 @@
             }
 
             .carousel-btn {
-                padding: 0.5rem 1rem;
+                padding: var(--spacing-xs) var(--spacing-md);
                 font-size: 0.9rem;
+            }
+
+            .nav-right {
+                gap: var(--spacing-sm);
+            }
+
+            .btn {
+                padding: var(--spacing-sm) var(--spacing-md);
             }
         }
     </style>

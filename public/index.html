@@ -55,7 +55,7 @@
         .btn {
             padding: 0.8rem 1.5rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 0;
             cursor: pointer;
             font-size: 0.9rem;
             display: inline-flex;
@@ -141,7 +141,7 @@
             flex: 1;
             padding: 0.8rem 1rem;
             border: 2px solid #e0e0e0;
-            border-radius: 4px;
+            border-radius: 0;
             font-size: 1rem;
             transition: border-color 0.3s;
         }
@@ -161,7 +161,7 @@
         .filter-select {
             padding: 0.8rem;
             border: 2px solid #e0e0e0;
-            border-radius: 4px;
+            border-radius: 0;
             font-size: 1rem;
             background-color: white;
             min-width: 200px;
@@ -188,7 +188,7 @@
 
         .job-card {
             background: white;
-            border-radius: 10px;
+            border-radius: 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 1.5rem;
             transition: all 0.3s ease;
@@ -258,7 +258,7 @@
             background-color: white;
             margin: 2rem auto;
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 0;
             max-width: 800px;
             position: relative;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -295,7 +295,7 @@
             background-color: #e3f2fd;
             color: #1976d2;
             padding: 0.5rem 1rem;
-            border-radius: 1rem;
+            border-radius: 0;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
@@ -416,12 +416,12 @@
         <div class="filters">
             <select id="experienceFilter" class="filter-select">
                 <option value="">All Experience Levels</option>
-                <option value="Fresher">Fresher</option>
-                <option value="Intern">Intern</option>
-                <option value="Entry Level">Entry Level</option>
-                <option value="Mid Level">Mid Level</option>
-                <option value="Senior Level">Senior Level</option>
-                <option value="Executive">Executive</option>
+                <option value="Fresher">Fresher (0 Years)</option>
+                <option value="Intern">Intern (0-1 Years)</option>
+                <option value="Entry Level">Entry Level (1-2 Years)</option>
+                <option value="Mid Level">Mid Level (3-5 Years)</option>
+                <option value="Senior Level">Senior Level (5-8 Years)</option>
+                <option value="Executive">Executive (8+ Years)</option>
             </select>
             <select id="typeFilter" class="filter-select">
                 <option value="">All Job Types</option>
@@ -517,6 +517,15 @@
                 return dateB - dateA;
             });
 
+            const experienceRanges = {
+                'Fresher': '0 Years',
+                'Intern': '0-1 Years',
+                'Entry Level': '1-2 Years',
+                'Mid Level': '3-5 Years',
+                'Senior Level': '5-8 Years',
+                'Executive': '8+ Years'
+            };
+
             elements.jobList.innerHTML = sortedJobs.map(job => `
                 <div class="job-card">
                     <div class="job-header">
@@ -526,7 +535,7 @@
                             <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
                             <span><i class="fas fa-briefcase"></i> ${job.type}</span>
                             <span><i class="fas fa-money-bill-wave"></i> ${job.salary}</span>
-                            <span><i class="fas fa-user-graduate"></i> ${job.experience}</span>
+                            <span><i class="fas fa-user-graduate"></i> ${job.experience} (${experienceRanges[job.experience] || job.experience})</span>
                         </div>
                     </div>
                     <div class="job-description">
@@ -549,6 +558,15 @@
                 const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
                 const job = await response.json();
                 
+                const experienceRanges = {
+                    'Fresher': '0 Years',
+                    'Intern': '0-1 Years',
+                    'Entry Level': '1-2 Years',
+                    'Mid Level': '3-5 Years',
+                    'Senior Level': '5-8 Years',
+                    'Executive': '8+ Years'
+                };
+                
                 elements.modalContent.innerHTML = `
                     <h2 class="modal-job-title">${job.title}</h2>
                     <p class="job-company">${job.company}</p>
@@ -556,7 +574,7 @@
                         <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
                         <span><i class="fas fa-briefcase"></i> ${job.type}</span>
                         <span><i class="fas fa-money-bill-wave"></i> ${job.salary}</span>
-                        <span><i class="fas fa-user-graduate"></i> ${job.experience}</span>
+                        <span><i class="fas fa-user-graduate"></i> ${job.experience} (${experienceRanges[job.experience] || job.experience})</span>
                     </div>
                     <div class="modal-job-description">
                         <h4>Description</h4>

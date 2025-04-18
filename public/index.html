@@ -226,6 +226,14 @@
             font-size: 0.9rem;
         }
 
+        .job-age {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
         .job-description {
             flex: 2;
             color: #34495e;
@@ -467,6 +475,20 @@
             closeModal: document.querySelector('.close-modal')
         };
 
+        function getRelativeTime(date) {
+            const now = new Date();
+            const postedDate = new Date(date);
+            const diffInSeconds = Math.floor((now - postedDate) / 1000);
+            
+            if (diffInSeconds < 60) return 'Latest';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+            if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+            if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+            return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+        }
+
         // Event Listeners
         elements.searchBtn.addEventListener('click', loadJobs);
         elements.searchInput.addEventListener('keypress', (e) => {
@@ -529,7 +551,10 @@
             elements.jobList.innerHTML = sortedJobs.map(job => `
                 <div class="job-card">
                     <div class="job-header">
-                        <h2 class="job-title">${job.title}</h2>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h2 class="job-title">${job.title}</h2>
+                            <span class="job-age">${getRelativeTime(job.postedDate)}</span>
+                        </div>
                         <p class="job-company">${job.company}</p>
                         <div class="job-meta">
                             <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
@@ -568,7 +593,10 @@
                 };
                 
                 elements.modalContent.innerHTML = `
-                    <h2 class="modal-job-title">${job.title}</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 class="modal-job-title">${job.title}</h2>
+                        <span class="job-age">${getRelativeTime(job.postedDate)}</span>
+                    </div>
                     <p class="job-company">${job.company}</p>
                     <div class="job-meta">
                         <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>

@@ -8,98 +8,92 @@ if (!token) {
 const API_BASE_URL = '/api';
 
 // DOM Elements
-const jobForm = document.getElementById('jobForm');
-const addJobBtn = document.getElementById('addJobBtn');
-const jobList = document.getElementById('jobList');
-const logoutBtn = document.getElementById('logoutBtn');
-const sourceSelect = document.getElementById('source');
-const applyLinkGroup = document.getElementById('applyLinkGroup');
-const applyLinkInput = document.getElementById('applyLink');
+const elements = {
+    jobForm: document.getElementById('jobForm'),
+    addJobBtn: document.getElementById('addJobBtn'),
+    jobList: document.getElementById('jobList'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    sourceSelect: document.getElementById('source'),
+    applyLinkGroup: document.getElementById('applyLinkGroup'),
+    applyLinkInput: document.getElementById('applyLink'),
+    jobFormModal: document.getElementById('jobFormModal'),
+    closeModal: document.querySelector('.close-modal'),
+    modalTitle: document.getElementById('modalTitle'),
+    searchInput: document.getElementById('searchInput'),
+    filterSelect: document.getElementById('filterSelect')
+};
 
 // Add a variable to track the current job being edited
 let currentJobId = null;
+let jobs = [];
 
 // Event Listeners
-addJobBtn.addEventListener('click', () => {
-    currentJobId = null; // Reset the current job ID when adding a new job
-    jobForm.reset();
-    jobForm.style.display = 'block';
-    jobForm.scrollIntoView({ behavior: 'smooth' });
+document.addEventListener('DOMContentLoaded', () => {
+    loadJobs();
+    setupEventListeners();
 });
 
-// Handle job source change
-sourceSelect.addEventListener('change', () => {
-    if (sourceSelect.value === 'External') {
-        applyLinkGroup.style.display = 'block';
-        applyLinkInput.required = true;
-    } else {
-        applyLinkGroup.style.display = 'none';
-        applyLinkInput.required = false;
-        applyLinkInput.value = '';
-    }
-});
-
-// Update the form submission handler
-jobForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-        alert('Session expired. Please login again.');
-        window.location.href = '/login.html';
-        return;
-    }
-    
-    const jobData = {
-        title: document.getElementById('title').value,
-        company: document.getElementById('company').value,
-        location: document.getElementById('location').value,
-        salary: document.getElementById('salary').value,
-        type: document.getElementById('type').value,
-        experience: document.getElementById('experience').value,
-        education: document.getElementById('education').value,
-        source: document.getElementById('source').value,
-        description: document.getElementById('description').value,
-        requirements: document.getElementById('requirements').value.split(',').map(skill => skill.trim()),
-        applyLink: document.getElementById('applyLink').value,
-        status: document.getElementById('status').value
-    };
-
-    try {
-        const url = currentJobId 
-            ? `${API_BASE_URL}/jobs/${currentJobId}`
-            : `${API_BASE_URL}/jobs`;
-            
-        const method = currentJobId ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(jobData)
+function setupEventListeners() {
+    // Add Job button
+    if (elements.addJobBtn) {
+        elements.addJobBtn.addEventListener('click', () => {
+            currentJobId = null;
+            if (elements.jobForm) elements.jobForm.reset();
+            if (elements.modalTitle) elements.modalTitle.textContent = 'Add New Job';
+            if (elements.jobFormModal) {
+                elements.jobFormModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to save job');
-        }
-
-        jobForm.reset();
-        jobForm.style.display = 'none';
-        currentJobId = null; // Reset the current job ID
-        loadJobs();
-    } catch (error) {
-        console.error('Error:', error);
-        alert(error.message || 'An error occurred while saving the job');
     }
-});
 
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('adminToken');
-    window.location.href = '/login.html';
-});
+    // Close modal button
+    if (elements.closeModal) {
+        elements.closeModal.addEventListener('click', () => {
+            if (elements.jobFormModal) {
+                elements.jobFormModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    // Form submission
+    if (elements.jobForm) {
+        elements.jobForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Search and filter
+    if (elements.searchInput) {
+        elements.searchInput.addEventListener('input', filterJobs);
+    }
+    if (elements.filterSelect) {
+        elements.filterSelect.addEventListener('change', filterJobs);
+    }
+
+    // Handle job source change
+    if (elements.sourceSelect && elements.applyLinkGroup) {
+        elements.sourceSelect.addEventListener('change', () => {
+            if (elements.sourceSelect.value === 'External') {
+                elements.applyLinkGroup.style.display = 'block';
+                if (elements.applyLinkInput) elements.applyLinkInput.required = true;
+            } else {
+                elements.applyLinkGroup.style.display = 'none';
+                if (elements.applyLinkInput) {
+                    elements.applyLinkInput.required = false;
+                    elements.applyLinkInput.value = '';
+                }
+            }
+        });
+    }
+
+    // Logout button
+    if (elements.logoutBtn) {
+        elements.logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login.html';
+        });
+    }
+}
 
 // Load jobs
 async function loadJobs() {
@@ -120,40 +114,49 @@ async function loadJobs() {
             throw new Error('Failed to load jobs');
         }
 
-        const jobs = await response.json();
+        jobs = await response.json();
         displayJobs(jobs);
     } catch (error) {
         console.error('Error loading jobs:', error);
-        jobList.innerHTML = '<div class="no-jobs">Error loading jobs. Please try again later.</div>';
+        if (elements.jobList) {
+            elements.jobList.innerHTML = '<div class="no-jobs">Error loading jobs. Please try again later.</div>';
+        }
     }
 }
 
 // Display jobs
-function displayJobs(jobs) {
-    if (!jobs || jobs.length === 0) {
-        jobList.innerHTML = '<div class="no-jobs">No jobs found.</div>';
+function displayJobs(jobsToDisplay) {
+    if (!elements.jobList) return;
+    
+    elements.jobList.innerHTML = '';
+    
+    if (!jobsToDisplay || jobsToDisplay.length === 0) {
+        elements.jobList.innerHTML = '<div class="no-jobs">No jobs found.</div>';
         return;
     }
 
-    jobList.innerHTML = jobs.map(job => `
-        <div class="job-item">
-            <div class="job-info">
+    jobsToDisplay.forEach(job => {
+        const jobCard = document.createElement('div');
+        jobCard.className = 'job-card';
+        jobCard.innerHTML = `
+            <div class="job-header">
                 <h3>${job.title}</h3>
-                <p class="job-company">${job.company}</p>
-                <div class="job-meta">
-                    <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
-                    <span><i class="fas fa-briefcase"></i> ${job.type}</span>
-                    <span><i class="fas fa-money-bill-wave"></i> ${job.salary}</span>
-                    <span><i class="fas fa-user-graduate"></i> ${job.experience}</span>
-                    <span class="status-chip ${job.status.toLowerCase().replace(' ', '-')}">${job.status}</span>
-                </div>
+                <p class="company">${job.company}</p>
+            </div>
+            <div class="job-details">
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Salary:</strong> ${job.salary}</p>
+                <p><strong>Type:</strong> ${job.type}</p>
+                <p><strong>Experience:</strong> ${job.experience}</p>
+                <p><strong>Status:</strong> ${job.status}</p>
             </div>
             <div class="job-actions">
-                <button onclick="editJob('${job._id}')" class="edit-btn">Edit</button>
-                <button onclick="deleteJob('${job._id}')" class="delete-btn">Delete</button>
+                <button onclick="editJob('${job._id}')" class="btn btn-primary">Edit</button>
+                <button onclick="deleteJob('${job._id}')" class="btn btn-danger">Delete</button>
             </div>
-        </div>
-    `).join('');
+        `;
+        elements.jobList.appendChild(jobCard);
+    });
 }
 
 // Edit job
@@ -181,31 +184,42 @@ async function editJob(jobId) {
         currentJobId = jobId;
         
         // Populate form with job data
-        document.getElementById('title').value = job.title;
-        document.getElementById('company').value = job.company;
-        document.getElementById('location').value = job.location;
-        document.getElementById('salary').value = job.salary;
-        document.getElementById('type').value = job.type;
-        document.getElementById('experience').value = job.experience;
-        document.getElementById('education').value = job.education;
-        document.getElementById('source').value = job.source;
-        document.getElementById('description').value = job.description;
-        document.getElementById('requirements').value = job.requirements.join(', ');
-        document.getElementById('status').value = job.status;
+        if (elements.jobForm) {
+            elements.jobForm.reset();
+            elements.jobForm.elements.title.value = job.title;
+            elements.jobForm.elements.company.value = job.company;
+            elements.jobForm.elements.location.value = job.location;
+            elements.jobForm.elements.salary.value = job.salary;
+            elements.jobForm.elements.type.value = job.type;
+            elements.jobForm.elements.experience.value = job.experience;
+            elements.jobForm.elements.education.value = job.education;
+            elements.jobForm.elements.source.value = job.source;
+            elements.jobForm.elements.status.value = job.status;
+            elements.jobForm.elements.description.value = job.description;
+            elements.jobForm.elements.requirements.value = job.requirements.join(', ');
 
-        // Handle apply link
-        if (job.source === 'External') {
-            applyLinkGroup.style.display = 'block';
-            applyLinkInput.required = true;
-            applyLinkInput.value = job.applyLink || '';
-        } else {
-            applyLinkGroup.style.display = 'none';
-            applyLinkInput.required = false;
-            applyLinkInput.value = '';
+            // Handle apply link
+            if (job.source === 'External') {
+                if (elements.applyLinkGroup) elements.applyLinkGroup.style.display = 'block';
+                if (elements.applyLinkInput) {
+                    elements.applyLinkInput.required = true;
+                    elements.applyLinkInput.value = job.applyLink || '';
+                }
+            } else {
+                if (elements.applyLinkGroup) elements.applyLinkGroup.style.display = 'none';
+                if (elements.applyLinkInput) {
+                    elements.applyLinkInput.required = false;
+                    elements.applyLinkInput.value = '';
+                }
+            }
         }
 
-        jobForm.style.display = 'block';
-        jobForm.scrollIntoView({ behavior: 'smooth' });
+        // Set modal title
+        if (elements.modalTitle) elements.modalTitle.textContent = 'Edit Job';
+        if (elements.jobFormModal) {
+            elements.jobFormModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
     } catch (error) {
         console.error('Error loading job:', error);
         alert('Failed to load job details');
@@ -214,30 +228,35 @@ async function editJob(jobId) {
 
 // Delete job
 async function deleteJob(jobId) {
-    if (confirm('Are you sure you want to delete this job?')) {
-        try {
-            const token = localStorage.getItem('adminToken');
-            if (!token) {
-                window.location.href = '/login.html';
-                return;
-            }
+    if (!confirm('Are you sure you want to delete this job?')) {
+        return;
+    }
 
-            const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete job');
-            }
-
-            loadJobs();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to delete job');
+    try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
         }
+
+        const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete job');
+        }
+
+        // Remove job from local array and update display
+        jobs = jobs.filter(job => job._id !== jobId);
+        displayJobs(jobs);
+        alert('Job deleted successfully');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to delete job');
     }
 }
 
@@ -246,5 +265,90 @@ document.getElementById('status').addEventListener('change', function() {
     this.className = `status-select ${this.value.toLowerCase().replace(' ', '-')}`;
 });
 
-// Initialize
-loadJobs(); 
+// Handle form submission
+async function handleFormSubmit(event) {
+    event.preventDefault();
+
+    if (!elements.jobForm) return;
+
+    const formData = new FormData(elements.jobForm);
+    const requirements = formData.get('requirements');
+    const description = document.getElementById('description').value;
+    
+    const jobData = {
+        title: formData.get('title'),
+        company: formData.get('company'),
+        location: formData.get('location'),
+        salary: formData.get('salary'),
+        type: formData.get('type'),
+        experience: formData.get('experience'),
+        education: formData.get('education'),
+        source: formData.get('source'),
+        status: formData.get('status'),
+        description: description,
+        requirements: requirements ? requirements.split(',').map(req => req.trim()).filter(req => req) : []
+    };
+
+    // Validate required fields
+    if (!jobData.description) {
+        alert('Please enter a job description');
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        const url = currentJobId ? `${API_BASE_URL}/jobs/${currentJobId}` : `${API_BASE_URL}/jobs`;
+        const method = currentJobId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(jobData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to save job');
+        }
+
+        // Close modal and refresh job list
+        elements.jobForm.reset();
+        if (elements.jobFormModal) {
+            elements.jobFormModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        await loadJobs();
+        alert(`Job ${currentJobId ? 'updated' : 'added'} successfully`);
+    } catch (error) {
+        console.error('Error saving job:', error);
+        alert(error.message || 'Failed to save job. Please try again.');
+    }
+}
+
+// Filter jobs based on search and filter criteria
+function filterJobs() {
+    if (!elements.searchInput || !elements.filterSelect) return;
+
+    const searchTerm = elements.searchInput.value.toLowerCase();
+    const filterValue = elements.filterSelect.value;
+
+    const filteredJobs = jobs.filter(job => {
+        const matchesSearch = job.title.toLowerCase().includes(searchTerm) ||
+                            job.company.toLowerCase().includes(searchTerm) ||
+                            job.location.toLowerCase().includes(searchTerm);
+        
+        const matchesFilter = filterValue === 'all' || job.status === filterValue;
+        
+        return matchesSearch && matchesFilter;
+    });
+
+    displayJobs(filteredJobs);
+} 

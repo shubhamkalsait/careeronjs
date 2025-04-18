@@ -1,7 +1,7 @@
 // Check authentication
-const token = localStorage.getItem('adminToken');
+const token = localStorage.getItem('token');
 if (!token) {
-    window.location.href = '/login.html';
+    window.location.href = '/';
 }
 
 // API Base URL
@@ -89,8 +89,8 @@ function setupEventListeners() {
     // Logout button
     if (elements.logoutBtn) {
         elements.logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('adminToken');
-            window.location.href = '/login.html';
+            localStorage.removeItem('token');
+            window.location.href = '/';
         });
     }
 }
@@ -98,9 +98,9 @@ function setupEventListeners() {
 // Load jobs
 async function loadJobs() {
     try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login.html';
+            window.location.href = '/';
             return;
         }
 
@@ -162,9 +162,9 @@ function displayJobs(jobsToDisplay) {
 // Edit job
 async function editJob(jobId) {
     try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login.html';
+            window.location.href = '/';
             return;
         }
 
@@ -233,9 +233,9 @@ async function deleteJob(jobId) {
     }
 
     try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login.html';
+            window.location.href = '/';
             return;
         }
 
@@ -296,9 +296,9 @@ async function handleFormSubmit(event) {
     }
 
     try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login.html';
+            window.location.href = '/';
             return;
         }
 

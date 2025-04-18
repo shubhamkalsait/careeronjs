@@ -25,7 +25,7 @@ const connectDB = async () => {
 
 // Schemas
 const adminSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true }
 });
 
@@ -67,14 +67,14 @@ const authenticateToken = (req, res, next) => {
 // Routes
 app.post('/api/auth/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const admin = await Admin.findOne({ username });
+        const { email, password } = req.body;
+        const admin = await Admin.findOne({ email });
 
         if (!admin || admin.password !== password) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ username: admin.username }, process.env.JWT_SECRET);
+        const token = jwt.sign({ email: admin.email }, process.env.JWT_SECRET);
         res.json({ token });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -179,14 +179,14 @@ app.delete('/api/jobs/:id', authenticateToken, async (req, res) => {
 // Initialize admin user
 const initializeAdmin = async () => {
     try {
-        const adminExists = await Admin.findOne({ username: 'admin' });
+        const adminExists = await Admin.findOne({ email: 'admin@careeronjs.com' });
         if (!adminExists) {
             const admin = new Admin({
-                username: 'admin',
+                email: 'admin@careeronjs.com',
                 password: 'admin123'
             });
             await admin.save();
-            console.log('Admin user created');
+            console.log('Admin user created with email: admin@careeronjs.com');
         }
     } catch (error) {
         console.error('Error initializing admin:', error);
